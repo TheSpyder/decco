@@ -94,6 +94,7 @@ jobs:
         mv $(Pipeline.Workspace)/$(artifact-linux)/ppx-linux.exe .
         mv $(Pipeline.Workspace)/$(artifact-macos)/ppx-macos.exe .
         mv $(Pipeline.Workspace)/$(artifact-windows)/ppx-windows.exe .
+        chmod u+x ppx ppx.cmd ppx-*.exe
       displayName: 'move files into place'
     - publish: '.'
       artifact: 'npm-package'
