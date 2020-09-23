@@ -1,0 +1,7 @@
+# Steps for publishing binaries
+
+steps:
+  - publish: '$(PPX_EXE)'
+    artifact: 'binary-$(Agent.OS)'
+    displayName: 'publish executable'
+    condition: succeeded()

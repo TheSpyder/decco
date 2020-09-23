@@ -1,0 +1,7 @@
+  steps:
+  - task: Cache@2
+    inputs:
+      securityNamespace: cache
+      key: 'esy | "$(Agent.OS)"'
+      path: $(ESY__CACHE)
+    displayName: Cache Esy binaries

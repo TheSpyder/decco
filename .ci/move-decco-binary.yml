@@ -1,0 +1,4 @@
+steps:
+  - script: |
+      mv "ppx_src/_esy/default/build/default/bin/bin.exe" "$(PPX_EXE)"
+    displayName: 'prepare to publish'

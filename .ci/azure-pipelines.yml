@@ -1,0 +1,100 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+name: $(Build.SourceVersion)
+jobs:
+- job: Linux
+  timeoutInMinutes: 0
+  pool:
+    vmImage: 'Ubuntu 20.04'
+
+  variables:
+    PPX_EXE: ppx-linux.exe
+    ESY__CACHE: $(Agent.TempDirectory)/.esy-cache
+    ESY__CACHE_INSTALL_PATH: $(ESY__CACHE)/i
+    ESY__CACHE_SOURCE_TARBALL_PATH: $(ESY__CACHE)/s
+
+  steps:
+  - template: use-node.yml
+  - template: esy-cache.yml
+  - template: esy-build-steps.yml
+  - template: move-decco-binary.yml
+  - template: publish-decco-binary.yml
+
+
+- job: MacOS
+  timeoutInMinutes: 0
+  pool:
+    vmImage: 'macOS-latest'
+
+  variables:
+    PPX_EXE: ppx-macos.exe
+    ESY__CACHE: $(Agent.TempDirectory)/.esy-cache
+    ESY__CACHE_INSTALL_PATH: $(ESY__CACHE)/i
+    ESY__CACHE_SOURCE_TARBALL_PATH: $(ESY__CACHE)/s
+
+  steps:
+  - template: use-node.yml
+  - template: esy-cache.yml
+  - template: esy-build-steps.yml
+  - template: move-decco-binary.yml
+  - template: publish-decco-binary.yml
+
+- job: Windows
+  timeoutInMinutes: 0
+  pool:
+    vmImage: 'vs2017-win2016'
+
+  variables:
+    PPX_EXE: ppx-windows.exe
+    ESY__CACHE: $(Agent.TempDirectory)\esy-cache
+    ESY__CACHE_INSTALL_PATH: $(ESY__CACHE)\i
+    ESY__CACHE_SOURCE_TARBALL_PATH: $(ESY__CACHE)\s
+
+  steps:
+  - template: use-node.yml
+  - template: esy-cache.yml
+  - template: esy-build-steps.yml
+  # esy on windows doesn't create the 'default' folder so we have to search for the binary
+  - task: BatchScript@1
+    inputs:
+      filename: ppx_src\ppx_windows_copy.cmd
+    displayName: 'prepare to publish'
+  - template: publish-decco-binary.yml
+
+- job: Release
+  timeoutInMinutes: 0
+  displayName: Release
+  dependsOn:
+      - Linux
+      - MacOS
+      - Windows
+  condition: succeeded()
+  pool:
+     vmImage: 'Ubuntu 20.04'
+
+  variables:
+    artifact-linux: binary-Linux
+    artifact-macos: binary-Darwin
+    artifact-windows: binary-Windows_NT
+
+  steps:
+    - download: current
+      artifact: '$(artifact-linux)'
+      displayName: 'Include linux exe'
+    - download: current
+      artifact: '$(artifact-macos)'
+      displayName: 'Include macOS exe'
+    - download: current
+      artifact: '$(artifact-windows)'
+      displayName: 'Include windows exe'
+    - script: |
+        mv $(Pipeline.Workspace)/$(artifact-linux)/ppx-linux.exe .
+        mv $(Pipeline.Workspace)/$(artifact-macos)/ppx-macos.exe .
+        mv $(Pipeline.Workspace)/$(artifact-windows)/ppx-windows.exe .
+      displayName: 'move files into place'
+    - publish: '.'
+      artifact: 'npm-package'
+      displayName: 'Publish Package ready for Release'
