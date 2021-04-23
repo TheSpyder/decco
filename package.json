@@ -7,9 +7,9 @@
     "test": "jest lib/js/test",
     "build-lib": "bsb -clean-world -make-world",
     "watch": "bsb -clean-world -make-world -w",
-    "clean": "rm -rf lib && bsb -clean-world && rm -rf ppx_src/_esy",
-    "build-ppx": "cd ppx_src && esy",
-    "watch-ppx": "cd ppx_src && esy dune build -w"
+    "clean": "rm -rf lib && bsb -clean-world && rm -rf _esy",
+    "build-ppx": "esy dune build -p ppx_decco",
+    "watch-ppx": "esy dune build -p ppx_decco -w"
   },
   "files": [
     "/bsconfig.json",

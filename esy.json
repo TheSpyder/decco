@@ -1,8 +1,7 @@
 {
   "name": "ppx_decco",
   "version": "0.0.0",
-  "description": "This is a hack because esy doesn't appear to support scoped packages (or I just don't get it)",
-  "main": "index.js",
+  "description": "Decco ppxlib binary",
   "license": "MIT",
   "esy": {
     "build": "dune build -p #{self.name}",
