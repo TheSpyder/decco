@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "jest lib/js/test",
-    "build-lib": "bsb -clean-world -make-world",
     "watch": "bsb -clean-world -make-world -w",
     "clean": "rm -rf lib && bsb -clean-world && rm -rf ppx_src/_esy",
-    "build-ppx": "cd ppx_src && esy",
-    "watch-ppx": "cd ppx_src && esy dune build -w"
+    "build": "yarn build-ppx && yarn build-lib",
+    "build-lib": "bsb -clean-world -make-world",
+    "build-ppx": "esy",
+    "watch-ppx": "esy dune build -w"
   },
   "files": [
     "/bsconfig.json",
