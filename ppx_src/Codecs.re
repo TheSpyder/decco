@@ -13,18 +13,18 @@ let rec parameterizeCodecs = (typeArgs, encoderFunc, decoderFunc, generatorSetti
         | None => None
         | Some(encoderFunc) =>
             subEncoders
-            |> List.map(e => (Asttypes.Nolabel, BatOption.get(e)))
+            |> List.map(e => (Asttypes.Nolabel, Option.get(e)))
             |> Exp.apply(encoderFunc)
-            |> BatOption.some
+            |> Option.some
         },
 
         switch decoderFunc {
         | None => None
         | Some(decoderFunc) =>
             subDecoders
-            |> List.map(e => (Asttypes.Nolabel, BatOption.get(e)))
+            |> List.map(e => (Asttypes.Nolabel, Option.get(e)))
             |> Exp.apply(decoderFunc)
-            |> BatOption.some
+            |> Option.some
         }
     )
 }
@@ -108,12 +108,12 @@ and generateCodecs = (
             (
                 doEncode ? Some(
                     compositeCodecs
-                    |> List.map(((e, _)) => BatOption.get(e))
+                    |> List.map(((e, _)) => Option.get(e))
                     |> Tuple.generateEncoder)
                 : None,
                 doDecode ? Some(
                     compositeCodecs
-                    |> List.map(((_, d)) => BatOption.get(d))
+                    |> List.map(((_, d)) => Option.get(d))
                     |> Tuple.generateDecoder)
                 : None
             );

@@ -16,12 +16,12 @@ let generateEncoder = (decls, unboxed) => {
         ? {
             let { codecs, field } = List.hd(decls);
             let (e, _) = codecs;
-            [%expr (v) => [%e BatOption.get(e)]([%e field])]
+            [%expr (v) => [%e Option.get(e)]([%e field])]
         } : {
             let arrExpr =
                 decls
                 |> List.map(({ key, field, codecs: (encoder, _) }) =>
-                    [%expr ([%e key], [%e BatOption.get(encoder)]([%e field]))]
+                    [%expr ([%e key], [%e Option.get(encoder)]([%e field]))]
                 )
                 |> Exp.array;
             [%expr [%e arrExpr] |> Js.Dict.fromArray |> Js.Json.object_]
@@ -30,7 +30,7 @@ let generateEncoder = (decls, unboxed) => {
 };
 
 let generateDictGet = ({ key, codecs: (_, decoder), default }) => {
-    let decoder = BatOption.get(decoder);
+    let decoder = Option.get(decoder);
     switch default {
         | Some(default) => [%expr
             Js.Dict.get(dict, [%e key])
@@ -97,7 +97,7 @@ let generateDecoder = (decls, unboxed) => {
                 |> Exp.record(_, None);
 
             [%expr (v) =>
-                [%e BatOption.get(d)](v)
+                [%e Option.get(d)](v)
                 -> Belt.Result.map(v => [%e recordExpr])
             ]
         } :

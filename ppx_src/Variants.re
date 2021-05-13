@@ -21,7 +21,7 @@ let generateEncoderCase = (generatorSettings, unboxed, { pcd_name: { txt: name }
 
             let rhsList = args
                 |> List.map(Codecs.generateCodecs(generatorSettings))
-                |> List.map(((encoder, _)) => BatOption.get(encoder)) /* TODO: refactor */
+                |> List.map(((encoder, _)) => Option.get(encoder)) /* TODO: refactor */
                 |> List.mapi((i, e) =>
                     Exp.apply(
                         ~loc=pcd_loc, e,
@@ -69,7 +69,7 @@ let generateArgDecoder = (generatorSettings, args, constructorName) => {
     |> Exp.match(args
         |> List.map(Codecs.generateCodecs(generatorSettings))
         |> List.mapi((i, (_, decoder)) =>
-            Exp.apply(BatOption.get(decoder), [(
+            Exp.apply(Option.get(decoder), [(
                 Asttypes.Nolabel,
                 {
                     /* +1 because index 0 is the constructor */
@@ -150,7 +150,7 @@ let generateCodecs = ({ doEncode, doDecode } as generatorSettings, constrDecls, 
             List.map(generateEncoderCase(generatorSettings, unboxed), constrDecls)
             |> Exp.match([%expr v])
             |> Exp.fun_(Asttypes.Nolabel, None, [%pat? v])
-            |> BatOption.some
+            |> Option.some
         : None;
 
     let decoderDefaultCase = {
